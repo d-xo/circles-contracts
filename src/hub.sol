@@ -86,6 +86,10 @@ contract Hub {
     function transferThrough(address[] memory users, uint wad) public {
         require(users.length <= 5);
 
+        for (uint i = 0; i < users.length; i++) {
+            require(trustable(users[i]));
+        }
+
         address prev = msg.sender;
         for (uint i = 0; i < users.length; i++) {
             address curr = users[i];

@@ -43,9 +43,4 @@ contract Token is ERC20 {
         return super.balanceOf(usr) * rate;
     }
 
-    function transferFrom(address src, address dst, uint wad) public {
-        require(hub.trustable(dst));
-        super.transferFrom(src, dst, wad);
-    }
-
 }
