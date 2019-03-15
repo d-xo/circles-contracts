@@ -11,7 +11,7 @@ contract HubLike {
 contract Token is ERC20 {
     // auth
     address public owner;
-    function updateOwner(address usr) public onlyOwner { owner = usr; }
+    function updateOwner(address usr) public auth { owner = usr; }
     modifier auth() { require(msg.sender == owner); _; }
 
     // data
