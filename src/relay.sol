@@ -24,7 +24,7 @@ contract Relay {
         bytes32 sigR,
         bytes32 sigS,
         address destination,
-        bytes memory data,
+        bytes memory data
     )
         public
         auth
