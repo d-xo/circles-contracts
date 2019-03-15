@@ -27,11 +27,8 @@ contract Hub {
     mapping (address => Token) public tokens;
     mapping (Token => address) public people;
 
-    // businesses
-    mapping (address => bool) public isValidator;
-    mapping (address => bool) public isOrganization;
-
     // trust
+    mapping (address => bool) public isValidator;
     mapping (address => mapping (address => uint)) public limits;
 
     // logs
@@ -57,7 +54,7 @@ contract Hub {
 
     // introductions
     function join() external {
-        require(!trustable(msg.sender), "cannot enter the system twice")
+        require(!trustable(msg.sender), "validators cannot have a currency")
 
         Token token = new Token(msg.sender, gift);
         token.approve(this, -1);
@@ -68,11 +65,9 @@ contract Hub {
         emit Signup(msg.sender, address(token));
     }
 
-    function register(bytes32 what, address usr) public {
-        require(!trustable(usr), "cannot enter the system twice")
-
-        if (what == "validator") isValidator[usr] = true;
-        if (what == "organization") isOrganization[usr] = true;
+    function register(address usr) public {
+        require(!trustable(usr), "currency holders cannot be validators")
+        isValidator[usr] = true;
     }
 
     // relationships
@@ -85,7 +80,7 @@ contract Hub {
     }
 
     function trustable(address usr) public returns (bool) {
-        return address(tokens[usr]) != address(0) || isValidator[usr] || isOrganization[usr];
+        return address(tokens[usr]) != address(0) || isValidator[usr];
     }
 
     // care work
