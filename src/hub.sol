@@ -35,7 +35,6 @@ contract Hub {
     event Signup(address indexed user, address token);
     event Trust(address indexed from, address indexed to, uint256 limit);
     event RegisterValidator(address indexed validator);
-    event RegisterOrganization(address indexed organization);
 
     // init
     constructor(uint gift_, uint give_, uint take_) public {
