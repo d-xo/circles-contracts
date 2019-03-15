@@ -41,7 +41,7 @@ contract Hub {
     event RegisterOrganization(address indexed organization);
 
     // init
-    constructor(uint gift_, uint give_, uint take_, string calldata name_) public {
+    constructor(uint gift_, uint give_, uint take_) public {
         owner = msg.sender;
         gift = gift_;
         give = give_;
