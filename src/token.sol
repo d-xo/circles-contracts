@@ -5,14 +5,14 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 contract HubLike {
     function give() returns (uint);
     function take() returns (uint);
-    function trustable(address who) returns (bool);
+    function trustable(address usr) returns (bool);
 }
 
 contract Token is ERC20 {
     // auth
     address public owner;
-    modifier onlyOwner() { require(msg.sender == owner); _; }
-    function updateOwner(address who) public onlyOwner { owner = who; }
+    function updateOwner(address usr) public onlyOwner { owner = usr; }
+    modifier auth() { require(msg.sender == owner); _; }
 
     // data
     Hublike public hub;  // governance interface & trust graph
@@ -29,7 +29,7 @@ contract Token is ERC20 {
     }
 
     // basic income & demurrage
-    function flux() public onlyOwner {
+    function collect() public onlyOwner {
         uint period = now - then;
 
         rate = rate - (period * hub.take());

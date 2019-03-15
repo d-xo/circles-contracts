@@ -15,7 +15,7 @@ import "./token.sol";
 contract Hub {
     // auth
     address public owner;
-    function updateOwner(address who) public auth { owner = who; }
+    function updateOwner(address usr) public auth { owner = usr; }
     modifier auth() { require (msg.sender == owner); _; }
 
     // monetary policy
@@ -28,8 +28,8 @@ contract Hub {
     mapping (Token => address) public people;
 
     // businesses
-    mapping (address => bool) public isOrganization;
     mapping (address => bool) public isValidator;
+    mapping (address => bool) public isOrganization;
 
     // trust
     mapping (address => mapping (address => uint)) public limits;
@@ -48,7 +48,7 @@ contract Hub {
         take = take_;
     }
 
-    // admin
+    // governance
     function file(bytes32 what, uint data) public auth {
         if (what == "gift") gift = data;
         if (what == "give") give = data;
@@ -66,34 +66,30 @@ contract Hub {
 	    tokens[msg.sender] = token;
         people[address(token)] = sender;
 
-        emit Signup(sender, address(token));
+        emit Signup(msg.sender, address(token));
     }
 
-    function register(bytes32 what, address who) public {
-        if (what == "validator") isValidator[who] = true;
-        if (what == "organization") isOrganization[who] = true;
+    function register(bytes32 what, address usr) public {
+        if (what == "validator") isValidator[usr] = true;
+        if (what == "organization") isOrganization[usr] = true;
     }
 
     // relationships
-    function trust(address who, uint limit) public {
-        require(trustable(who));
+    function trust(address usr, uint limit) public {
+        require(trustable(usr));
 
-        limits[msg.sender][who] = limit;
+        limits[msg.sender][usr] = limit;
 
-        emit Trust(msg.sender, who, limit);
+        emit Trust(msg.sender, usr, limit);
     }
 
-    function trustable(address who) public returns (bool) {
-        return address(tokens[who]) != address(0) || isValidator[who] || isOrganization[who];
+    function trustable(address usr) public returns (bool) {
+        return address(tokens[usr]) != address(0) || isValidator[usr] || isOrganization[usr];
     }
 
     // care work
     function transferThrough(address[] memory users, uint wad) public {
         require(users.length <= 5);
-
-        for (uint i = 0; i < users.length; i++) {
-            require(trustable(users[i]));
-        }
 
         address prev = msg.sender;
         for (uint i = 0; i < users.length; i++) {
@@ -102,15 +98,15 @@ contract Hub {
             if (isValidator[curr]) {
 
                 address next = users[i+1];
-                require(limits[prev][curr] > 0);
-                require(tokens[prev].balanceOf(next) + wad <= limits[next][curr]);
+                require(limits[curr][prev] > 0, "validator does not trust sender");
+                require(tokens[prev].balanceOf(next) + wad <= limits[next][curr], "trust limit too low");
 
                 tokens[prev].transferFrom(prev, next, wad);
                 prev = next;
 
             } else {
 
-                require(tokens[prev].balanceOf(curr) + wad <= limits[curr][prev]);
+                require(tokens[prev].balanceOf(curr) + wad <= limits[curr][prev], "trust limit too low");
 
                 tokens[prev].transferFrom(prev, curr, wad);
                 prev = curr;
