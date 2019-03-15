@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "./erc20.sol";
 
 contract HubLike {
     function give() returns (uint);
