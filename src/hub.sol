@@ -59,7 +59,7 @@ contract Hub {
         Token token = new Token(msg.sender, gift);
         token.approve(this, -1);
 
-	    tokens[msg.sender] = token;
+        tokens[msg.sender] = token;
         people[address(token)] = sender;
 
         emit Signup(msg.sender, address(token));

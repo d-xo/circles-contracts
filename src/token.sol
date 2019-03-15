@@ -21,8 +21,8 @@ contract Token is ERC20 {
 
     // init
     constructor(address owner_, uint gift) public {
-	    hub   = HubLike(msg.sender);
-	    owner = owner_;
+        hub   = HubLike(msg.sender);
+        owner = owner_;
 
         mint(owner, gift);
         approve(hub, -1);
