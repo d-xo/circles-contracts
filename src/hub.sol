@@ -24,8 +24,8 @@ contract Hub {
     uint public take;  // demurrage rate
 
     // money
-    mapping (address => Token) public tokens;
-    mapping (Token => address) public people;
+    mapping (address => Token)   public tokens;
+    mapping (address => address) public people;
 
     // trust
     mapping (address => bool) public isValidator;
@@ -53,19 +53,19 @@ contract Hub {
 
     // introductions
     function join() external {
-        require(!trustable(msg.sender), "validators cannot have a currency")
+        require(!trustable(msg.sender), "validators cannot have a currency");
 
         Token token = new Token(msg.sender, gift);
-        token.approve(this, -1);
+        token.approve(address(this), uint(-1));
 
         tokens[msg.sender] = token;
-        people[address(token)] = sender;
+        people[address(token)] = msg.sender;
 
         emit Signup(msg.sender, address(token));
     }
 
     function register(address usr) public {
-        require(!trustable(usr), "currency holders cannot be validators")
+        require(!trustable(usr), "currency holders cannot be validators");
         isValidator[usr] = true;
     }
 
@@ -78,7 +78,7 @@ contract Hub {
         emit Trust(msg.sender, usr, limit);
     }
 
-    function trustable(address usr) public returns (bool) {
+    function trustable(address usr) public view returns (bool) {
         return address(tokens[usr]) != address(0) || isValidator[usr];
     }
 

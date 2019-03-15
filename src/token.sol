@@ -1,45 +1,41 @@
 pragma solidity ^0.5.0;
 
-import "./erc20.sol";
+import "ds-token/token.sol";
 
 contract HubLike {
-    function give() returns (uint);
-    function take() returns (uint);
-    function trustable(address usr) returns (bool);
+    function give() public returns (uint);
+    function take() public returns (uint);
+    function trustable(address usr) public view returns (bool);
 }
 
-contract Token is ERC20 {
-    // auth
-    address public owner;
-    function updateOwner(address usr) public auth { owner = usr; }
-    modifier auth() { require(msg.sender == owner); _; }
-
+contract Token is DSTokenBase(0) {
     // data
-    Hublike public hub;  // governance interface & trust graph
-    uint    public rate; // demurrage scaling factor
-    uint    public then; // last touched
+    HubLike public hub;   // governance interface & trust graph
+    uint    public rate;  // demurrage scaling factor
+    uint    public then;  // last touched
+    address public owner; // owner
 
     // init
     constructor(address owner_, uint gift) public {
         hub   = HubLike(msg.sender);
         owner = owner_;
 
-        mint(owner, gift);
-        approve(hub, -1);
+        _balances[owner_] = gift;
+        approve(address(hub), uint(-1));
     }
 
     // basic income & demurrage
-    function collect() public onlyOwner {
+    function collect() public {
         uint period = now - then;
 
         rate = rate - (period * hub.take());
-        balances[address(this)] = period * hub.give();
+        _balances[owner] = period * hub.give();
 
         then = now;
     }
 
     // ERC-20
-    function balanceOf(address usr) public view {
+    function balanceOf(address usr) public view returns (uint) {
         return super.balanceOf(usr) * rate;
     }
 
