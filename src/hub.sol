@@ -100,14 +100,15 @@ contract Hub {
 
                 address next = users[i+1];
                 require(limits[curr][prev] > 0, "validator does not trust sender");
-                require(tokens[prev].balanceOf(next) + wad <= limits[next][curr], "trust limit too low");
+                require(tokens[prev].balanceOf(next) + wad <= limits[next][curr], "trust limit exceeded");
 
                 tokens[prev].transferFrom(prev, next, wad);
                 prev = next;
+                i++;
 
             } else {
 
-                require(tokens[prev].balanceOf(curr) + wad <= limits[curr][prev], "trust limit too low");
+                require(tokens[prev].balanceOf(curr) + wad <= limits[curr][prev], "trust limit exceeded");
 
                 tokens[prev].transferFrom(prev, curr, wad);
                 prev = curr;
