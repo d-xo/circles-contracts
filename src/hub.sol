@@ -57,8 +57,7 @@ contract Hub {
 
     // introductions
     function join() external {
-        require(address(tokens[msg.sender]) == address(0));
-	    require(!isOrganization[sender]);
+        require(!trustable(msg.sender), "cannot enter the system twice")
 
         Token token = new Token(msg.sender, gift);
         token.approve(this, -1);
@@ -70,6 +69,8 @@ contract Hub {
     }
 
     function register(bytes32 what, address usr) public {
+        require(!trustable(usr), "cannot enter the system twice")
+
         if (what == "validator") isValidator[usr] = true;
         if (what == "organization") isOrganization[usr] = true;
     }
