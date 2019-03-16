@@ -45,7 +45,8 @@ first install [`dapptools`](https://dapp.tools/) (`curl https://dapp.tools/insta
 
 then:
 
-- `build`: `dapp build`
-- `test`: `dapp test`
+- `dapp build` to build
+- `dapp test` to test
+- `dapp debug` to debug unit tests
 
 
