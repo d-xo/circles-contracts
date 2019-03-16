@@ -9,22 +9,26 @@ contract User {
     }
 }
 
+contract Validator {}
+
 contract Test is DSTest {
 
     uint gift = 1 ether;
     uint give = 2 wei;
     uint take = 3 wei;
 
-    function test_constructor() public {
-        Hub hub = new Hub(gift, give, take);
+    Hub hub = new Hub(gift, give, take);
+    User user = new User();
+    Validator validator = new Validator();
 
+    function test_constructor() public {
         assertEq(hub.gift(), gift);
         assertEq(hub.give(), give);
         assertEq(hub.take(), take);
     }
 
     function test_file() public {
-        Hub hub = new Hub(0, 0, 0);
+        hub = new Hub(0, 0, 0);
 
         hub.file("gift", gift);
         hub.file("give", give);
@@ -36,14 +40,16 @@ contract Test is DSTest {
     }
 
     function test_join() public {
-        Hub hub = new Hub(gift, give, take);
-        User user = new User();
+        Token token = hub.tokens(address(user));
+        assertTrue(address(token) == address(0x0));
 
         user.join(hub);
-        Token token = hub.tokens(address(user));
 
-        // user stored
+        // token created
+        token = hub.tokens(address(user));
         assertTrue(address(token) != address(0x0));
+
+        // reverse lookup
         assertEq(hub.people(address(token)), address(user));
 
         // hub can manage users tokens
@@ -51,6 +57,14 @@ contract Test is DSTest {
 
         // user has correct inital balance
         assertEq(token.balanceOf(address(user)), gift);
+    }
+
+    function test_register() public {
+        assertTrue(!hub.isValidator(address(validator)));
+
+        hub.register(address(validator));
+
+        assertTrue(hub.isValidator(address(validator)));
     }
 }
 
