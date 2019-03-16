@@ -4,7 +4,13 @@ import "ds-test/test.sol";
 import "../hub.sol";
 
 contract User {
-    function join(Hub hub) public { hub.join(); }
+    Hub hub;
+    constructor(Hub hub_) public {
+        hub = hub_;
+    }
+
+    function join() public { hub.join(); }
+    function trust(address usr, uint limit) public { hub.trust(usr, limit); }
 }
 
 contract Test is DSTest {
@@ -15,14 +21,17 @@ contract Test is DSTest {
     Hub hub = new Hub(gift, give, take);
 
     address me    = address(this);
-    address alice = address(new User());
-    address bob   = address(new User());
+    address alice = address(new User(hub));
+    address bob   = address(new User(hub));
 
     address validator = address(0xdeadbeef);
 
     function setUp() public {
-        User(alice).join(hub);
-        User(bob).join(hub);
+        User(alice).join();
+        User(bob).join();
+
+        User(alice).trust(bob, uint(-1));
+        User(bob).trust(alice, uint(-1));
     }
 }
 
@@ -43,7 +52,7 @@ contract Admin is DSTest {
     uint take = 3 wei;
 
     function test_file() public {
-        hub = new Hub(0, 0, 0);
+        Hub hub = new Hub(0, 0, 0);
 
         hub.file("gift", gift);
         hub.file("give", give);
@@ -85,7 +94,7 @@ contract Entry is Test {
     }
 }
 
-contract Join is Test {
+contract Trust is Test {
     function test_trust() public {
         assertEq(hub.limits(me, alice), 0);
 
