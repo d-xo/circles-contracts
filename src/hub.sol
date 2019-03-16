@@ -67,6 +67,7 @@ contract Hub {
     function register(address usr) public {
         require(!trustable(usr), "currency holders cannot be validators");
         isValidator[usr] = true;
+        emit RegisterValidator(usr);
     }
 
     // relationships
