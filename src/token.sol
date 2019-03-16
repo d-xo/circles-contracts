@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "ds-token/token.sol";
+import "ds-test/test.sol";
 
 contract HubLike {
     function give() public returns (uint);
@@ -8,7 +9,7 @@ contract HubLike {
     function trustable(address usr) public view returns (bool);
 }
 
-contract Token is DSTokenBase(0) {
+contract Token is DSTokenBase(0), DSTest {
     // data
     HubLike public hub;   // governance interface & trust graph
     uint    public rate;  // demurrage scaling factor
@@ -20,8 +21,11 @@ contract Token is DSTokenBase(0) {
         hub   = HubLike(msg.sender);
         owner = owner_;
 
-        _balances[owner_] = gift;
-        approve(address(hub), uint(-1));
+        rate = 1;
+        then = now;
+
+        _balances[owner] = gift;
+        _approvals[owner][address(hub)] = uint(-1);
     }
 
     // basic income & demurrage

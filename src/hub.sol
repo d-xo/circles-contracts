@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "./token.sol";
+import "ds-test/test.sol";
 
 //role of validators
 //hubfactory?
@@ -56,7 +57,6 @@ contract Hub {
         require(!trustable(msg.sender), "validators cannot have a currency");
 
         Token token = new Token(msg.sender, gift);
-        token.approve(address(this), uint(-1));
 
         tokens[msg.sender] = token;
         people[address(token)] = msg.sender;
